@@ -1,7 +1,12 @@
-import { Box } from "@mui/material"
+import { Container } from "@mui/material";
+import TodoList from "../../components/todo-list/todo-list";
 
 const Home = () => {
-    return <Box>Home page</Box>
-}
+  return (
+    <Container maxWidth="sm">
+      <TodoList />
+    </Container>
+  );
+};
 
 export default Home;
