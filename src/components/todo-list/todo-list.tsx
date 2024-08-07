@@ -1,4 +1,10 @@
-import { Box, Checkbox, FormControlLabel, FormGroup } from "@mui/material";
+import {
+  Box,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  Typography,
+} from "@mui/material";
 import styles from "./todo-list.module.scss";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { SyntheticEvent, useState } from "react";
@@ -56,7 +62,15 @@ const TodoList = () => {
                       >
                         <FormControlLabel
                           control={<Checkbox />}
-                          label={task.name}
+                          label={
+                            <Box
+                              className={`${
+                                task.done ? styles.lineThrough : ""
+                              }`}
+                            >
+                              {task.name}
+                            </Box>
+                          }
                           checked={task.done}
                           onChange={(
                             event: SyntheticEvent<Element, Event>,
