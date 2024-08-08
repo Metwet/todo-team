@@ -1,13 +1,9 @@
-import {
-  Box,
-  Checkbox,
-  FormControlLabel,
-  FormGroup,
-  Typography,
-} from "@mui/material";
+import { Box, Checkbox, FormControlLabel, FormGroup } from "@mui/material";
 import styles from "./todo-list.module.scss";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
-import { SyntheticEvent, useState } from "react";
+import { ChangeEvent, SyntheticEvent, useState } from "react";
+import TaskInput from "./task-input/task-input";
+import { DragIndicator } from "@mui/icons-material";
 
 const TodoList = () => {
   const todoList = [
@@ -15,7 +11,8 @@ const TodoList = () => {
     { id: 2, name: "task2", done: false },
     { id: 3, name: "task3", done: false },
   ];
-  const [currentTodoList, setCurrentTodoList] = useState<Array<any>>(todoList);
+  const [currentTodoList, setCurrentTodoList] =
+    useState<Array<ITask>>(todoList);
 
   const handleOnDragEnd = (result: any) => {
     if (!result.destination) return;
@@ -26,10 +23,22 @@ const TodoList = () => {
     setCurrentTodoList(items);
   };
 
-  const handleCheck = (checkedTask: any, checked: boolean) => {
+  const handleCheck = (checkedTask: ITask, checked: boolean) => {
     const items = currentTodoList.map((task) => {
       if (task.id === checkedTask.id) {
         task.done = checked;
+      }
+      return task;
+    });
+    setCurrentTodoList(items);
+  };
+
+  const handleInputChange = (event: ChangeEvent, changedTask: ITask) => {
+    const element = event.currentTarget as HTMLInputElement;
+    const value = element.value;
+    const items = currentTodoList.map((task) => {
+      if (task.id === changedTask.id) {
+        task.name = value;
       }
       return task;
     });
@@ -44,7 +53,7 @@ const TodoList = () => {
             <Box
               {...provided.droppableProps}
               ref={provided.innerRef}
-              sx={{ width: 500, mt: 2 }}
+              sx={{ mt: 2 }}
             >
               <FormGroup>
                 {currentTodoList.map((task, index) => (
@@ -63,12 +72,15 @@ const TodoList = () => {
                         <FormControlLabel
                           control={<Checkbox />}
                           label={
-                            <Box
-                              className={`${
-                                task.done ? styles.lineThrough : ""
-                              }`}
-                            >
-                              {task.name}
+                            <Box>
+                              <TaskInput
+                                value={task.name}
+                                handleInputChange={(event: ChangeEvent) =>
+                                  handleInputChange(event, task)
+                                }
+                                lineThrough={task.done}
+                              />
+                              <DragIndicator />
                             </Box>
                           }
                           checked={task.done}
