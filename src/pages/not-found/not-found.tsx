@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const NotFound = () => {
   return (
-    <Container maxWidth="lg">
+    <Box>
       <Typography
         variant="h2"
         gutterBottom
@@ -21,7 +21,7 @@ const NotFound = () => {
           HOME PAGE
         </Link>
       </Box>
-    </Container>
+    </Box>
   );
 };
 

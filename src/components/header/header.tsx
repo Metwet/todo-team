@@ -10,7 +10,7 @@ interface IHeaderPropps {
 const Header: React.FC<IHeaderPropps> = ({ theme, toggleTheme }) => {
   return (
     <Box className={styles.header}>
-      <Typography variant="h3">App-title</Typography>
+      <Typography variant="h3">dischope</Typography>
       <Tooltip
         title={
           theme === "light" ? "Включить темную тему" : "Включить светлую тему"
