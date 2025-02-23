@@ -1,4 +1,4 @@
-import { Box, Container, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import styles from "./not-found.module.scss";
 import { Link } from "react-router-dom";
 
