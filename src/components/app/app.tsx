@@ -2,7 +2,7 @@ import { Container, CssBaseline, ThemeProvider } from "@mui/material";
 import Header from "./../header/header";
 import { useEffect, useMemo, useState } from "react";
 import { darkTheme, lightTheme } from "../../utils/theme";
-import { Route, Routes } from "react-router-dom";
+import { Outlet, Route, Routes } from "react-router-dom";
 import { EP_ALL, EP_HOME } from "../../utils/constants";
 import Home from "../../pages/home/home";
 import NotFound from "../../pages/not-found/not-found";
@@ -35,10 +35,7 @@ const App: React.FC = () => {
       <CssBaseline />
       <Container maxWidth="lg">
         <Header theme={theme} toggleTheme={toggleTheme} />
-        <Routes>
-          <Route path={EP_HOME} element={<Home />}></Route>
-          <Route path={EP_ALL} element={<NotFound />}></Route>
-        </Routes>
+        <Outlet />
       </Container>
     </ThemeProvider>
   );

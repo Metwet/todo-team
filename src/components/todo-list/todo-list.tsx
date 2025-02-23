@@ -1,18 +1,13 @@
 import { Box, Checkbox, FormControlLabel, FormGroup } from "@mui/material";
 import styles from "./todo-list.module.scss";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
-import { ChangeEvent, SyntheticEvent, useState } from "react";
+import { ChangeEvent, SyntheticEvent, useEffect, useState } from "react";
 import TaskInput from "./task-input/task-input";
 import { DragIndicator } from "@mui/icons-material";
+import { getTestTasks } from "../../utils/api";
 
 const TodoList = () => {
-  const todoList = [
-    { id: 1, name: "task1", done: false },
-    { id: 2, name: "task2", done: false },
-    { id: 3, name: "task3", done: false },
-  ];
-  const [currentTodoList, setCurrentTodoList] =
-    useState<Array<ITask>>(todoList);
+  const [currentTodoList, setCurrentTodoList] = useState<Array<ITask>>([]);
 
   const handleOnDragEnd = (result: any) => {
     if (!result.destination) return;
@@ -38,12 +33,16 @@ const TodoList = () => {
     const value = element.value;
     const items = currentTodoList.map((task) => {
       if (task.id === changedTask.id) {
-        task.name = value;
+        task.text = value;
       }
       return task;
     });
     setCurrentTodoList(items);
   };
+
+  useEffect(() => {
+    getTestTasks().then((data) => setCurrentTodoList(data));
+  }, []);
 
   return (
     <Box className={styles.todolist}>
@@ -74,7 +73,7 @@ const TodoList = () => {
                           label={
                             <Box>
                               <TaskInput
-                                value={task.name}
+                                value={task.text}
                                 handleInputChange={(event: ChangeEvent) =>
                                   handleInputChange(event, task)
                                 }
