@@ -1,22 +1,20 @@
-import { Box, Checkbox, FormControlLabel, FormGroup } from "@mui/material";
+import {
+  Box,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  Typography,
+} from "@mui/material";
 import styles from "./todo-list.module.scss";
-import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { ChangeEvent, SyntheticEvent, useEffect, useState } from "react";
 import TaskInput from "./task-input/task-input";
 import { DragIndicator } from "@mui/icons-material";
 import { getTestTasks } from "../../utils/api";
+import { useUpdateEffect } from "../../hooks/useUpdateEffect";
 
 const TodoList = () => {
   const [currentTodoList, setCurrentTodoList] = useState<Array<ITask>>([]);
-
-  const handleOnDragEnd = (result: any) => {
-    if (!result.destination) return;
-
-    const items = Array.from(currentTodoList);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-    setCurrentTodoList(items);
-  };
+  const [currentDays, setCurrentDays] = useState<ITaskDays | null>(null);
 
   const handleCheck = (checkedTask: ITask, checked: boolean) => {
     const items = currentTodoList.map((task) => {
@@ -40,64 +38,67 @@ const TodoList = () => {
     setCurrentTodoList(items);
   };
 
+  const createDays = (tasks: Array<ITask>) => {
+    const days: ITaskDays = {};
+    tasks.forEach((task) => {
+      const date = new Date(task.create_date);
+      const day = date.toDateString();
+      if (!days[day]) {
+        days[day] = [task];
+      } else {
+        days[day].push(task);
+      }
+    });
+    setCurrentDays(days);
+  };
+
   useEffect(() => {
-    getTestTasks().then((data) => setCurrentTodoList(data));
+    getTestTasks().then((data) => {
+      createDays(data);
+      setCurrentTodoList(data);
+    });
   }, []);
+
+  useUpdateEffect(() => {
+    console.log(currentDays);
+  }, [currentDays]);
 
   return (
     <Box className={styles.todolist}>
-      <DragDropContext onDragEnd={handleOnDragEnd}>
-        <Droppable droppableId="subjects">
-          {(provided) => (
-            <Box
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              sx={{ mt: 2 }}
-            >
-              <FormGroup>
-                {currentTodoList.map((task, index) => (
-                  <Draggable
-                    key={task.id.toString()}
-                    index={index}
-                    draggableId={task.id.toString()}
-                  >
-                    {(provided) => (
-                      <Box
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        className={styles.task}
-                      >
-                        <FormControlLabel
-                          control={<Checkbox />}
-                          label={
-                            <Box>
-                              <TaskInput
-                                value={task.text}
-                                handleInputChange={(event: ChangeEvent) =>
-                                  handleInputChange(event, task)
-                                }
-                                lineThrough={task.done}
-                              />
-                              <DragIndicator />
-                            </Box>
-                          }
-                          checked={task.done}
-                          onChange={(
-                            event: SyntheticEvent<Element, Event>,
-                            checked: boolean
-                          ) => handleCheck(task, checked)}
-                        />
-                      </Box>
-                    )}
-                  </Draggable>
+      <FormGroup>
+        {currentDays &&
+          Object.keys(currentDays)
+            .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+            .map((day, index) => (
+              <Box key={index}>
+                <Typography>{day}</Typography>
+                {currentDays[day].map((task) => (
+                  <Box className={styles.task} key={task.id}>
+                    <FormControlLabel
+                      control={<Checkbox />}
+                      label={
+                        <Box>
+                          <TaskInput
+                            value={task.text}
+                            handleInputChange={(event: ChangeEvent) =>
+                              handleInputChange(event, task)
+                            }
+                            lineThrough={task.done}
+                          />
+                          <DragIndicator />
+                        </Box>
+                      }
+                      checked={task.done}
+                      onChange={(
+                        event: SyntheticEvent<Element, Event>,
+                        checked: boolean
+                      ) => handleCheck(task, checked)}
+                    />
+                  </Box>
                 ))}
-              </FormGroup>
-              {provided.placeholder}
-            </Box>
-          )}
-        </Droppable>
-      </DragDropContext>
+              </Box>
+            ))}
+      </FormGroup>
     </Box>
   );
 };

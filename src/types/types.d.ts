@@ -4,6 +4,10 @@ interface ITask {
   id: number;
   text: string;
   done: boolean;
-  //create_date: string;
-  appointed_date: string;
+  create_date: string;
+  //appointed_date: string;
+}
+
+interface ITaskDays {
+  [key: string]: Array<ITasks>;
 }
