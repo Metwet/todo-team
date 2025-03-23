@@ -1,42 +1,14 @@
-import {
-  Box,
-  Checkbox,
-  FormControlLabel,
-  FormGroup,
-  Typography,
-} from "@mui/material";
+import { Box, FormGroup } from "@mui/material";
 import styles from "./todo-list.module.scss";
-import { ChangeEvent, SyntheticEvent, useEffect, useState } from "react";
-import TaskInput from "./task-input/task-input";
-import { DragIndicator } from "@mui/icons-material";
+import { useEffect, useState } from "react";
 import { getTestTasks } from "../../utils/api";
 import { useUpdateEffect } from "../../hooks/useUpdateEffect";
+import { DndContext, DragEndEvent } from "@dnd-kit/core";
+import TaskDay from "./task-day/task-day";
 
 const TodoList = () => {
   const [currentTodoList, setCurrentTodoList] = useState<Array<ITask>>([]);
   const [currentDays, setCurrentDays] = useState<ITaskDays | null>(null);
-
-  const handleCheck = (checkedTask: ITask, checked: boolean) => {
-    const items = currentTodoList.map((task) => {
-      if (task.id === checkedTask.id) {
-        task.done = checked;
-      }
-      return task;
-    });
-    setCurrentTodoList(items);
-  };
-
-  const handleInputChange = (event: ChangeEvent, changedTask: ITask) => {
-    const element = event.currentTarget as HTMLInputElement;
-    const value = element.value;
-    const items = currentTodoList.map((task) => {
-      if (task.id === changedTask.id) {
-        task.text = value;
-      }
-      return task;
-    });
-    setCurrentTodoList(items);
-  };
 
   const createDays = (tasks: Array<ITask>) => {
     const days: ITaskDays = {};
@@ -52,12 +24,31 @@ const TodoList = () => {
     setCurrentDays(days);
   };
 
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    let needToCange: boolean = false;
+    const items = currentTodoList.map((task) => {
+      if (task.id === Number(active.id) && !!over) {
+        const date = new Date(over.id);
+        task.create_date = date.toISOString();
+        needToCange = true;
+      }
+      return task;
+    });
+    if (needToCange) {
+      setCurrentTodoList(items);
+    }
+  };
+
   useEffect(() => {
     getTestTasks().then((data) => {
-      createDays(data);
       setCurrentTodoList(data);
     });
   }, []);
+
+  useUpdateEffect(() => {
+    createDays(currentTodoList);
+  }, [currentTodoList]);
 
   useUpdateEffect(() => {
     console.log(currentDays);
@@ -65,40 +56,22 @@ const TodoList = () => {
 
   return (
     <Box className={styles.todolist}>
-      <FormGroup>
-        {currentDays &&
-          Object.keys(currentDays)
-            .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
-            .map((day, index) => (
-              <Box key={index}>
-                <Typography>{day}</Typography>
-                {currentDays[day].map((task) => (
-                  <Box className={styles.task} key={task.id}>
-                    <FormControlLabel
-                      control={<Checkbox />}
-                      label={
-                        <Box>
-                          <TaskInput
-                            value={task.text}
-                            handleInputChange={(event: ChangeEvent) =>
-                              handleInputChange(event, task)
-                            }
-                            lineThrough={task.done}
-                          />
-                          <DragIndicator />
-                        </Box>
-                      }
-                      checked={task.done}
-                      onChange={(
-                        event: SyntheticEvent<Element, Event>,
-                        checked: boolean
-                      ) => handleCheck(task, checked)}
-                    />
-                  </Box>
-                ))}
-              </Box>
-            ))}
-      </FormGroup>
+      <DndContext onDragEnd={handleDragEnd}>
+        <FormGroup>
+          {currentDays &&
+            Object.keys(currentDays)
+              .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+              .map((day, index) => (
+                <TaskDay
+                  key={index}
+                  day={day}
+                  taskList={currentDays[day]}
+                  currentTodoList={currentTodoList}
+                  setCurrentTodoList={setCurrentTodoList}
+                />
+              ))}
+        </FormGroup>
+      </DndContext>
     </Box>
   );
 };
