@@ -19,6 +19,7 @@ const TaskInput: FC<ITaskInputProps> = ({
       onChange={handleInputChange}
       className={`${lineThrough ? styles.lineThrough : ""}`}
       disableUnderline
+      multiline
     />
   );
 };

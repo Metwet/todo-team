@@ -1,4 +1,6 @@
 import { useDraggable } from "@dnd-kit/core";
+import { DragIndicator } from "@mui/icons-material";
+import { Box } from "@mui/material";
 import { FC, ReactNode } from "react";
 
 interface IDraggableProps {
@@ -18,8 +20,11 @@ const Draggable: FC<IDraggableProps> = ({ children, id }) => {
     : undefined;
 
   return (
-    <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
-      {children}
+    <div ref={setNodeRef} style={style} {...attributes}>
+      <Box display="flex" gap={1}>
+        {children}
+        <DragIndicator {...listeners} />
+      </Box>
     </div>
   );
 };

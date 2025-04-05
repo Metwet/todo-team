@@ -4,7 +4,6 @@ import Draggable from "../../dnd-kit/draggable";
 import Droppable from "../../dnd-kit/droppable";
 import styles from "../todo-list.module.scss";
 import TaskInput from "../task-input/task-input";
-import { DragIndicator } from "@mui/icons-material";
 
 interface ITaskDayProps {
   day: string;
@@ -59,7 +58,6 @@ const TaskDay: FC<ITaskDayProps> = ({
                         }
                         lineThrough={task.done}
                       />
-                      <DragIndicator />
                     </Box>
                   }
                   checked={task.done}
